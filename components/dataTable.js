@@ -9,8 +9,9 @@ import {
   Link,
 } from "@shopify/polaris";
 import Modal from "./modal";
+import Empty from "./empty.js";
 
-export default function Table({ data }) {
+export default function Table({ data, cId }) {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [modalData, setModalData] = useState();
@@ -40,8 +41,11 @@ export default function Table({ data }) {
     setModalData(modalData);
   };
   useEffect(() => {
-    setTotal(data.length);
-    const tableRows = data.map((row) => [
+    let pageData = data;
+    if (cId) {
+      pageData = data.filter((row) => row.customer_id.toString() === cId);
+    }
+    let tableRows = pageData.map((row) => [
       row.customer_name,
       row.customer_email,
       row.track,
@@ -54,42 +58,46 @@ export default function Table({ data }) {
       </Button>,
     ]);
 
+    setTotal(pageData.length);
     setRows(tableRows);
-  }, [data]);
+  }, [data, cId]);
 
   return (
     <Page title="Tracking Report">
-      <Card>
-        <DataTable
-          columnContentTypes={["text", "text", "numeric", "numeric"]}
-          headings={["Name", "Email", "Track", "History"]}
-          rows={rows.slice(
-            (currentPage - 1) * perPage,
-            total > currentPage * perPage - 1
-              ? currentPage * perPage - 1
-              : total
-          )}
-        />
-
-        <FooterHelp>
-          <Pagination
-            label={`${(currentPage - 1) * perPage}-${
+      {(cId === "" || (cId && rows.length > 0)) && (
+        <Card>
+          <DataTable
+            columnContentTypes={["text", "text", "numeric", "numeric"]}
+            headings={["Name", "Email", "Track", "History"]}
+            rows={rows.slice(
+              (currentPage - 1) * perPage,
               total > currentPage * perPage - 1
                 ? currentPage * perPage - 1
                 : total
-            } of total ${total}`}
-            hasPrevious={currentPage > 1}
-            onPrevious={() => {
-              setCurrentPage((currentPage) => currentPage - 1);
-            }}
-            hasNext={total > currentPage * perPage}
-            onNext={() => {
-              setCurrentPage((currentPage) => currentPage + 1);
-            }}
+            )}
           />
-        </FooterHelp>
-        <Modal open={open} data={modalData} />
-      </Card>
+
+          <FooterHelp>
+            <Pagination
+              label={`${(currentPage - 1) * perPage}-${
+                total > currentPage * perPage - 1
+                  ? currentPage * perPage - 1
+                  : total
+              } of total ${total}`}
+              hasPrevious={currentPage > 1}
+              onPrevious={() => {
+                setCurrentPage((currentPage) => currentPage - 1);
+              }}
+              hasNext={total > currentPage * perPage}
+              onNext={() => {
+                setCurrentPage((currentPage) => currentPage + 1);
+              }}
+            />
+          </FooterHelp>
+          <Modal open={open} data={modalData} />
+        </Card>
+      )}
+      {cId && rows.length === 0 && <Empty />}
     </Page>
   );
 }
