@@ -6,7 +6,8 @@ import Shopify, { ApiVersion } from "@shopify/shopify-api";
 import Koa from "koa";
 import next from "next";
 import Router from "koa-router";
-
+const cors = require("@koa/cors");
+const bodyParser = require("koa-bodyparser");
 dotenv.config();
 const port = parseInt(process.env.PORT, 10) || 8081;
 const dev = process.env.NODE_ENV !== "production";
@@ -32,7 +33,9 @@ const ACTIVE_SHOPIFY_SHOPS = {};
 
 app.prepare().then(async () => {
   const server = new Koa();
+  server.use(cors());
   const router = new Router();
+  var shopify_context;
   server.keys = [Shopify.Context.API_SECRET_KEY];
   server.use(
     createShopifyAuth({
@@ -41,7 +44,7 @@ app.prepare().then(async () => {
         const { shop, accessToken, scope } = ctx.state.shopify;
         const host = ctx.query.host;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
-
+        shopify_context = ctx.state;
         const response = await Shopify.Webhooks.Registry.register({
           shop,
           accessToken,
@@ -62,7 +65,7 @@ app.prepare().then(async () => {
       },
     })
   );
-
+  
   const handleRequest = async (ctx) => {
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
@@ -99,8 +102,12 @@ app.prepare().then(async () => {
     }
   });
 
+  server.use(bodyParser());
   server.use(router.allowedMethods());
   server.use(router.routes());
+
+  require("./router/customerRouter")(server);
+  require("./router/webhookRouter")(server);
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
   });
