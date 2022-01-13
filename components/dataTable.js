@@ -54,7 +54,7 @@ export default function Table({ data, cId }) {
           handleClick(row.history);
         }}
       >
-        Hisotry
+        History
       </Button>,
     ]);
 
