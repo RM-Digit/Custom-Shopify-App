@@ -1,5 +1,6 @@
 const Router = require("koa-router");
 const shopify = require("../../services/shopify");
+const trackModel = require("../../models/trackModel")
 
 const router = new Router({
   prefix: "/api/customers",
@@ -76,6 +77,15 @@ function register(app) {
         }
       });
     });
+    const bulkWrite = await trackModel.bulkWrite(
+      data.map(order => ({
+        updateOne: {
+          filter: { order_id: order.order_id },
+          update: { $set: order },
+          upsert: true,
+        },
+      }))
+    );
 
     ctx.body = { success: true, data: data };
   });

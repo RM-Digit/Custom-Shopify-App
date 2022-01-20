@@ -65,7 +65,7 @@ app.prepare().then(async () => {
       },
     })
   );
-  
+
   const handleRequest = async (ctx) => {
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
@@ -108,6 +108,8 @@ app.prepare().then(async () => {
 
   require("./router/customerRouter")(server);
   require("./router/webhookRouter")(server);
+  require("./router/posRouter")(server);
+
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
   });

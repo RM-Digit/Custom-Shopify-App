@@ -4,19 +4,26 @@ const Schema = mongoose.Schema;
 
 const CustomerModel = new Schema(
   {
-    id: {
+    order_id: {
       type: String,
       unique: true,
     },
-    email: {
+    customer_id: {
       type: String,
     },
-    name: {
+    customer_email: {
       type: String,
+    },
+    customer_name: {
+      type: String,
+    },
+    item_title: {
+      type: String,
+      default: 0
     },
     track: {
       type: Number,
-      default:0
+      default: 0
     },
   },
   { strict: true },
