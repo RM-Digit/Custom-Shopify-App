@@ -2,26 +2,23 @@ const mongoose = require("../services/mongoose").mongoose;
 
 const Schema = mongoose.Schema;
 
-const CustomerModel = new Schema(
+const ProductModel = new Schema(
   {
-    order_id: {
+    product_id: {
       type: String,
       unique: true,
     },
-    customer_id: {
+    title: {
       type: String,
     },
-    customer_email: {
+    image: {
       type: String,
     },
-    customer_name: {
+    totalInventory: {
       type: String,
     },
-    item_title: {
+    tags: {
       type: String,
-    },
-    history: {
-      type: Object,
     },
     track: {
       type: Number,
@@ -30,7 +27,7 @@ const CustomerModel = new Schema(
   },
   { strict: true },
   {
-    collection: "customers",
+    collection: "products",
     timestamps: {
       createdAt: "created_at",
       updatedAt: "updated_at",
@@ -38,4 +35,4 @@ const CustomerModel = new Schema(
   }
 );
 
-module.exports = mongoose.model("customers", CustomerModel);
+module.exports = mongoose.model("products", ProductModel);

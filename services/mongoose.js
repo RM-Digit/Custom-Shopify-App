@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const mongoose = require("mongoose");
 
-const db_addr = process.env.MONGO_URI;
+const db_addr = process.env.MONGO_URI_SHIFTSETGO;
 let count = 0;
 
 const options = {

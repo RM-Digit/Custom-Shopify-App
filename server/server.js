@@ -15,7 +15,7 @@ const app = next({
   dev,
 });
 const handle = app.getRequestHandler();
-
+console.log("process.env.SHOPIFY_API_KEY", process.env.SHOPIFY_API_KEY);
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
@@ -35,7 +35,7 @@ app.prepare().then(async () => {
   const server = new Koa();
   server.use(cors());
   const router = new Router();
-  var shopify_context;
+
   server.keys = [Shopify.Context.API_SECRET_KEY];
   server.use(
     createShopifyAuth({
@@ -44,7 +44,11 @@ app.prepare().then(async () => {
         const { shop, accessToken, scope } = ctx.state.shopify;
         const host = ctx.query.host;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
-        shopify_context = ctx.state;
+
+        console.log("shop", shop);
+        console.log("accessToken", accessToken);
+        console.log("scope", scope);
+
         const response = await Shopify.Webhooks.Registry.register({
           shop,
           accessToken,
@@ -109,6 +113,7 @@ app.prepare().then(async () => {
   require("./router/customerRouter")(server);
   require("./router/webhookRouter")(server);
   require("./router/posRouter")(server);
+  require("./router/productRouter")(server);
 
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);

@@ -40,6 +40,7 @@ export default function Table({ data, cId }) {
     setOpen(true);
     setModalData(modalData);
   };
+
   useEffect(() => {
     let pageData = data;
     if (cId) {
@@ -63,7 +64,7 @@ export default function Table({ data, cId }) {
   }, [data, cId]);
 
   return (
-    <Page title="Tracking Report">
+    <>
       {(cId === "" || (cId && rows.length > 0)) && (
         <Card>
           <DataTable
@@ -98,6 +99,6 @@ export default function Table({ data, cId }) {
         </Card>
       )}
       {cId && rows.length === 0 && <Empty />}
-    </Page>
+    </>
   );
 }
