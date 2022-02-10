@@ -15,7 +15,6 @@ const app = next({
   dev,
 });
 const handle = app.getRequestHandler();
-console.log("process.env.SHOPIFY_API_KEY", process.env.SHOPIFY_API_KEY);
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
@@ -44,10 +43,6 @@ app.prepare().then(async () => {
         const { shop, accessToken, scope } = ctx.state.shopify;
         const host = ctx.query.host;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
-
-        console.log("shop", shop);
-        console.log("accessToken", accessToken);
-        console.log("scope", scope);
 
         const response = await Shopify.Webhooks.Registry.register({
           shop,
