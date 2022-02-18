@@ -109,6 +109,7 @@ app.prepare().then(async () => {
   require("./router/webhookRouter")(server);
   require("./router/posRouter")(server);
   require("./router/productRouter")(server);
+  require("./router/resetRouter")(server);
 
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);

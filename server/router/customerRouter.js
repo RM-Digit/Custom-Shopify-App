@@ -75,10 +75,10 @@ async function updateTable() {
   const saveModel = await trackModel.insertMany(data);
   return saveModel;
 }
-cron.schedule("* * * * *", () => {
-  console.log("running a task every minute");
-  updateTable();
-});
+// cron.schedule("* * * * *", () => {
+//   console.log("running a task every minute");
+//   updateTable();
+// });
 
 const router = new Router({
   prefix: "/api/customers",
