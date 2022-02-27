@@ -105,10 +105,10 @@ async function updateTable() {
 
   return saveModel;
 }
-cron.schedule("* * * * *", () => {
-  console.log("running a task every minute");
-  updateTable();
-});
+// cron.schedule("* * * * *", () => {
+//   console.log("running a task every minute");
+//   updateTable();
+// });
 
 async function addAllCustomers() {
   const data = await trackModel.find({});
@@ -147,10 +147,10 @@ async function addAllCustomers() {
   console.log("update done");
 }
 
-// cron.schedule("*/3 * * * *", () => {
-//   console.log("running a task every minute");
-//   addAllCustomers();
-// });
+cron.schedule("*/3 * * * *", () => {
+  console.log("running a task every minute");
+  addAllCustomers();
+});
 
 const router = new Router({
   prefix: "/api/customers",
