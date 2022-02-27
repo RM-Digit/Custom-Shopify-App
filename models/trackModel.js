@@ -4,20 +4,14 @@ const Schema = mongoose.Schema;
 
 const CustomerModel = new Schema(
   {
-    order_id: {
-      type: String,
-      unique: true,
-    },
     customer_id: {
       type: String,
+      unique: true,
     },
     customer_email: {
       type: String,
     },
     customer_name: {
-      type: String,
-    },
-    item_title: {
       type: String,
     },
     history: {
@@ -30,7 +24,7 @@ const CustomerModel = new Schema(
   },
   { strict: true },
   {
-    collection: "customers",
+    collection: "customers2",
     timestamps: {
       createdAt: "created_at",
       updatedAt: "updated_at",
@@ -38,4 +32,4 @@ const CustomerModel = new Schema(
   }
 );
 
-module.exports = mongoose.model("customers", CustomerModel);
+module.exports = mongoose.model("customers2", CustomerModel);
