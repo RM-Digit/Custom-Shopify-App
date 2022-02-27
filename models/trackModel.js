@@ -24,7 +24,7 @@ const CustomerModel = new Schema(
   },
   { strict: true },
   {
-    collection: "customers2",
+    collection: "customers",
     timestamps: {
       createdAt: "created_at",
       updatedAt: "updated_at",
@@ -32,4 +32,4 @@ const CustomerModel = new Schema(
   }
 );
 
-module.exports = mongoose.model("customers2", CustomerModel);
+module.exports = mongoose.model("customers", CustomerModel);

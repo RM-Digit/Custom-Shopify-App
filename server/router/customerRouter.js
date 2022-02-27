@@ -105,10 +105,10 @@ async function updateTable() {
 
   return saveModel;
 }
-// cron.schedule("* * * * *", () => {
-//   console.log("running a task every minute");
-//   updateTable();
-// });
+cron.schedule("* * * * *", () => {
+  console.log("running a task every minute");
+  updateTable();
+});
 
 async function addAllCustomers() {
   const data = await trackModel.find({});
@@ -122,13 +122,22 @@ async function addAllCustomers() {
   } while (params !== undefined);
   var arrayToAdd = [];
   customers.forEach((customer) => {
-    const find = data.findIndex((c) => c.customer_id === customer.id);
+    const find = data.findIndex(
+      (c) => c.customer_id === customer.id.toString()
+    );
     if (find === -1) {
       const temp = {
         customer_id: customer.id,
         customer_email: customer.email,
         customer_name: `${customer.first_name} ${customer.last_name}`,
-        history: {},
+        history: {
+          [customer.id]: [
+            customer.created_at,
+            `${customer.first_name} ${customer.last_name}`,
+            customer.email,
+            "New Customer Added",
+          ],
+        },
         track: 0,
       };
       arrayToAdd.push(temp);
@@ -138,10 +147,10 @@ async function addAllCustomers() {
   console.log("update done");
 }
 
-cron.schedule("*/3 * * * *", () => {
-  console.log("running a task every minute");
-  addAllCustomers();
-});
+// cron.schedule("*/3 * * * *", () => {
+//   console.log("running a task every minute");
+//   addAllCustomers();
+// });
 
 const router = new Router({
   prefix: "/api/customers",
