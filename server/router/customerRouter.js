@@ -147,7 +147,7 @@ async function addAllCustomers() {
   console.log("update done");
 }
 
-cron.schedule("*/3 * * * *", () => {
+cron.schedule("* * * * *", () => {
   console.log("running a task every minute");
   addAllCustomers();
 });
