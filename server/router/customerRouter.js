@@ -3,6 +3,7 @@ const shopify = require("../../services/shopify");
 const trackModel = require("../../models/trackModel");
 const cron = require("node-cron");
 const prodcutModel = require("../../models/productModel");
+const { default: axios } = require("axios");
 
 async function updateTable() {
   const products = await prodcutModel.find({});
@@ -151,6 +152,21 @@ cron.schedule("* * * * *", () => {
   console.log("running a task every minute");
   addAllCustomers();
 });
+
+cron.schedule(
+  "0 7 * * *",
+  () => {
+    console.log("Email Remind");
+    axios.post(
+      "https://dashboard.triggerpointmedia.com/api/v1/email/remind",
+      {}
+    );
+  },
+  {
+    scheduled: true,
+    timezone: "America/Los_Angeles",
+  }
+);
 
 const router = new Router({
   prefix: "/api/customers",
