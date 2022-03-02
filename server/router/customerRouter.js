@@ -128,7 +128,7 @@ async function addAllCustomers() {
     );
     if (find === -1) {
       const temp = {
-        customer_id: customer.id,
+        customer_id: customer.id.toString(),
         customer_email: customer.email,
         customer_name: `${customer.first_name} ${customer.last_name}`,
         history: {
@@ -146,6 +146,7 @@ async function addAllCustomers() {
   });
   const update = await trackModel.insertMany(arrayToAdd);
   console.log("update done");
+  return arrayToAdd;
 }
 
 cron.schedule("* * * * *", () => {
@@ -177,6 +178,12 @@ function register(app) {
     console.log("update database");
     const updates = await updateTable();
     ctx.body = { success: true };
+  });
+
+  router.post("/addAll", async (ctx) => {
+    console.log("add database");
+    const adds = await addAllCustomers();
+    ctx.body = { success: true, adds: adds.length };
   });
 
   router.post("/get", async (ctx) => {
