@@ -3,7 +3,6 @@ const shopify = require("../../services/shopify");
 const trackModel = require("../../models/trackModel");
 const cron = require("node-cron");
 const prodcutModel = require("../../models/productModel");
-const { default: axios } = require("axios");
 
 async function updateTable() {
   const products = await prodcutModel.find({});
@@ -82,17 +81,17 @@ async function updateTable() {
           data.push(temp);
         }
       }
-
       if (
         check_rest === 2 &&
         duplicate_check[order.customer.id] !== undefined
       ) {
+        check_rest = 0;
         const i = duplicate_check[order.customer.id];
         data[i].track = 0;
         data[i].history = {
           ...data[i].history,
           [item.product_id + order.id]: [
-            new Date().toLocaleDateString(),
+            order.created_at,
             "Reset",
             order.order_status_url,
             0,
@@ -101,6 +100,16 @@ async function updateTable() {
       }
     });
   });
+
+  const bulkWrite = await trackModel.bulkWrite(
+    data.map((order) => ({
+      updateOne: {
+        filter: { customer_id: order.customer_id },
+        update: { $set: order },
+        upsert: true,
+      },
+    }))
+  );
   const deleteModel = await trackModel.deleteMany({});
   const saveModel = await trackModel.insertMany(data);
 
@@ -121,6 +130,7 @@ async function addAllCustomers() {
     customers = [...customers, ...pageData];
     params = pageData.nextPageParameters;
   } while (params !== undefined);
+  console.log("customers", customers.length);
   var arrayToAdd = [];
   customers.forEach((customer) => {
     const find = data.findIndex(
@@ -128,7 +138,7 @@ async function addAllCustomers() {
     );
     if (find === -1) {
       const temp = {
-        customer_id: customer.id.toString(),
+        customer_id: customer.id,
         customer_email: customer.email,
         customer_name: `${customer.first_name} ${customer.last_name}`,
         history: {
@@ -144,16 +154,15 @@ async function addAllCustomers() {
       arrayToAdd.push(temp);
     }
   });
+  console.log("arrayToAdd", arrayToAdd);
   const update = await trackModel.insertMany(arrayToAdd);
-  console.log("update done");
-  return arrayToAdd;
+  return arrayToAdd.length;
 }
 
-cron.schedule("* * * * *", () => {
-  console.log("running a task every minute");
-  addAllCustomers();
-});
-
+// cron.schedule("* * * * *", () => {
+//   console.log("running a task every minute");
+//   addAllCustomers();
+// });
 cron.schedule(
   "0 7 * * *",
   () => {
@@ -168,7 +177,6 @@ cron.schedule(
     timezone: "America/Los_Angeles",
   }
 );
-
 const router = new Router({
   prefix: "/api/customers",
 });
@@ -180,10 +188,10 @@ function register(app) {
     ctx.body = { success: true };
   });
 
-  router.post("/addAll", async (ctx) => {
+  router.post("/add", async (ctx) => {
     console.log("add database");
-    const adds = await addAllCustomers();
-    ctx.body = { success: true, adds: adds.length };
+    const add = await addAllCustomers();
+    ctx.body = { success: true };
   });
 
   router.post("/get", async (ctx) => {
