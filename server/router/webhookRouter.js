@@ -37,10 +37,14 @@ function register(app) {
     const customer = tracks.find((x) => x.customer_id === customer_id);
 
     if (customer) {
-      line_items.forEach((item) => {
+      let dataToSave = {};
+      dataToSave.track = customer.track;
+      for (let i = 0; i < line_items.length; i++) {
+        const item = line_items[i];
         if (Object.keys(purchaseUpdate).includes(item.product_id)) {
           const history = {
             ...customer.history,
+            ...dataToSave.history,
             [item.product_id + order.id]: [
               order.created_at,
               item.title,
@@ -48,18 +52,21 @@ function register(app) {
               purchaseUpdate[item.product_id] * item.quantity,
             ],
           };
-
-          trackModel.findOneAndUpdate(
-            { customer_id: customer_id },
-            {
-              $inc: {
-                track: purchaseUpdate[item.product_id] * item.quantity,
-              },
-              history: history,
-            }
-          );
+          dataToSave = {
+            customer_id: customer_id,
+            customer_email: order.customer.email,
+            customer_name: `${order.customer.first_name} ${order.customer.last_name}`,
+            track:
+              dataToSave.track +
+              purchaseUpdate[item.product_id] * item.quantity,
+            history: history,
+          };
         }
-      });
+      }
+      await trackModel.findOneAndReplace(
+        { customer_id: customer_id },
+        dataToSave
+      );
     } else if (hasSupplements) {
       let dataToSave = {};
       dataToSave.track = 0;
