@@ -13,10 +13,8 @@ function register(app) {
     const customer_id = order.customer.id.toString();
     const products = await prodcutModel.find({});
     const tracks = await trackModel.find({});
-    const resetProducts = [7342578958577, 7342578565361];
     var purchaseUpdate = {};
     var hasSupplements = false;
-    var check_rest = 0;
 
     products.forEach((product) => {
       purchaseUpdate = {
@@ -33,12 +31,6 @@ function register(app) {
     line_items.forEach((item) => {
       if (Object.keys(purchaseUpdate).includes(item.product_id)) {
         hasSupplements = true;
-      }
-      if (
-        resetProducts.includes(item.product_id) &&
-        item.total_discount === item.price
-      ) {
-        check_rest++;
       }
     });
 
@@ -123,22 +115,6 @@ function register(app) {
       inst.save(temp);
     }
 
-    if (check_rest >= 2) {
-      trackModel.findOneAndUpdate(
-        { customer_id: customer_id },
-        {
-          track: 0,
-          history: {
-            [order.id]: [
-              new Date().toLocaleDateString(),
-              "Reset",
-              order.order_status_url,
-              0,
-            ],
-          },
-        }
-      );
-    }
     ctx.status = 200;
     ctx.body = { success: true };
   });

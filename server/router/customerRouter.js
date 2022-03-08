@@ -154,7 +154,6 @@ async function addAllCustomers() {
       arrayToAdd.push(temp);
     }
   });
-  console.log("arrayToAdd", arrayToAdd);
   const update = await trackModel.insertMany(arrayToAdd);
   return arrayToAdd.length;
 }
